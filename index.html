@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/gif" href="assets/mimic-icon.gif">
+    <title>Buscamimics</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Buscaminas</h1>
+            <div class="game-info">
+                <div id="timer">Tiempo: 0s</div>
+                <div id="flags">Banderas: 0</div>
+                <div id="clicks">Clicks: 0</div>
+                <div id="hints">Comodines: 2</div>
+            </div>
+            
+        </header>
+        <div id="board" class="board"></div>
+        <div id="modal" class="modal">
+            <div class="modal-content">
+                <h2 id="modal-title"></h2>
+                <p id="modal-text"></p>
+            </div>
+        </div>
+        
+    </div>
+    <script src="game.js"></script>
+</body>
+</html>
