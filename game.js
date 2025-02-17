@@ -161,7 +161,6 @@ function handleLeftClick(event) {
     checkWin();
 }
 
-
 // Función para mostrar la animación de muerte
 function showDeathAnimation() {
     const youDied = document.getElementById('you-died');
@@ -249,6 +248,14 @@ function checkWin() {
     }
 }
 
+// Inicia el cronómetro
+function startTimer() {
+    timerInterval = setInterval(() => {
+        timer++;
+        document.getElementById('timer').textContent = `Tiempo: ${timer}s`;
+    }, 1000);
+}
+
 // Muestra el modal de victoria/derrota
 function showModal(title, text) {
     clearInterval(timerInterval);
@@ -258,6 +265,34 @@ function showModal(title, text) {
     modal.style.display = 'flex';
 }
 
+// Usa un comodín para revelar una mina
+function useHint() {
+    if (gameOver || firstClick || hintsRemaining <= 0) return;
+
+    // Busca una mina no revelada y no marcada con bandera
+    let mineFound = false;
+    for (let row = 0; row < gameConfig.rows && !mineFound; row++) {
+        for (let col = 0; col < gameConfig.cols && !mineFound; col++) {
+            if (board[row][col].isMine && !board[row][col].isRevealed && !board[row][col].isFlagged) {
+                board[row][col].isFlagged = true;
+                flagsPlaced++;
+                mineFound = true;
+                hintsRemaining--;
+                document.getElementById('hints').textContent = `Comodines: ${hintsRemaining}`;
+                document.getElementById('flags').textContent = `Banderas: ${flagsPlaced}/${gameConfig.mines}`;
+                renderBoard();
+                checkWin();
+            }
+        }
+    }
+}
+
+// Activa/desactiva el modo de pruebas
+function toggleTestMode() {
+    testMode = !testMode;
+    document.getElementById('test-button').classList.toggle('active');
+    renderBoard();
+}
 
 // Iniciar el juego cuando carga la página
 window.onload = startNewGame;
