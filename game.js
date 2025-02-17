@@ -153,10 +153,111 @@ function handleLeftClick(event) {
     if (board[row][col].isMine) {
         gameOver = true;
         revealAll();
-        showModal('¡Perdiste!', `Duraste ${timer} segundos y usaste ${clickCount} clicks.`);
+        showDeathAnimation();
         return;
     }
 
     revealCell(row, col);
     checkWin();
 }
+
+
+// Función para mostrar la animación de muerte
+function showDeathAnimation() {
+    const youDied = document.getElementById('you-died');
+    youDied.classList.add('active');
+    
+    // Mostrar el modal después de la animación
+    setTimeout(() => {
+        showModal('¡Perdiste!', `Duraste ${timer} segundos y usaste ${clickCount} clicks.`);
+        youDied.classList.remove('active');
+    }, 4000);
+}
+
+
+// Maneja el click derecho (colocar/quitar bandera)
+function handleRightClick(event) {
+    event.preventDefault();
+    if (gameOver || firstClick) return;
+
+    const row = parseInt(event.target.dataset.row);
+    const col = parseInt(event.target.dataset.col);
+
+    if (!board[row][col].isRevealed) {
+        if (!board[row][col].isFlagged && flagsPlaced < gameConfig.mines) {
+            board[row][col].isFlagged = true;
+            flagsPlaced++;
+        } else if (board[row][col].isFlagged) {
+            board[row][col].isFlagged = false;
+            flagsPlaced--;
+        }
+        document.getElementById('flags').textContent = `Banderas: ${flagsPlaced}/${gameConfig.mines}`;
+        renderBoard();
+        checkWin();
+    }
+}
+
+// Revela una celda y sus vecinas si es necesario
+function revealCell(row, col) {
+    if (row < 0 || row >= gameConfig.rows || col < 0 || col >= gameConfig.cols ||
+        board[row][col].isRevealed || board[row][col].isFlagged) {
+        return;
+    }
+
+    board[row][col].isRevealed = true;
+
+    if (board[row][col].neighborMines === 0) {
+        for (let i = -1; i <= 1; i++) {
+            for (let j = -1; j <= 1; j++) {
+                revealCell(row + i, col + j);
+            }
+        }
+    }
+    renderBoard();
+}
+
+// Revela todo el tablero (al ganar o perder)
+function revealAll() {
+    for (let row = 0; row < gameConfig.rows; row++) {
+        for (let col = 0; col < gameConfig.cols; col++) {
+            board[row][col].isRevealed = true;
+        }
+    }
+    renderBoard();
+}
+
+// Verifica si el jugador ha ganado
+function checkWin() {
+    let unrevealedSafeCells = 0;
+    let correctFlags = 0;
+
+    for (let row = 0; row < gameConfig.rows; row++) {
+        for (let col = 0; col < gameConfig.cols; col++) {
+            if (!board[row][col].isRevealed && !board[row][col].isMine) {
+                unrevealedSafeCells++;
+            }
+            if (board[row][col].isFlagged && board[row][col].isMine) {
+                correctFlags++;
+            }
+        }
+    }
+
+    if ((unrevealedSafeCells === 0) || (correctFlags === gameConfig.mines && flagsPlaced === gameConfig.mines)) {
+        gameOver = true;
+        revealAll();
+        showModal('¡Ganaste!', `¡Felicitaciones! Completaste el juego en ${timer} segundos y ${clickCount} clicks.`);
+    }
+}
+
+// Muestra el modal de victoria/derrota
+function showModal(title, text) {
+    clearInterval(timerInterval);
+    const modal = document.getElementById('modal');
+    document.getElementById('modal-title').textContent = title;
+    document.getElementById('modal-text').textContent = text;
+    modal.style.display = 'flex';
+}
+
+
+// Iniciar el juego cuando carga la página
+window.onload = startNewGame;
