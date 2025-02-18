@@ -19,6 +19,14 @@
                 <div id="clicks">Clicks: 0</div>
                 <div id="hints">Comodines: 2</div>
             </div>
+            <!-- Difficulty, hint and test button -->
+            <div class="difficulty">
+                <button onclick="setDifficulty('easy')">Fácil (8x8, 10 minas)</button>
+                <button onclick="setDifficulty('medium')">Normal (12x12, 20 minas)</button>
+                <button onclick="setDifficulty('hard')">Difícil (16x16, 40 minas)</button>
+                <button onclick="useHint()" class="hint-button">Usar Comodín</button>
+                <button onclick="toggleTestMode()" id="test-button" class="test-button">Modo Pruebas</button>
+            </div>
             
         </header>
         <!-- Board -->
