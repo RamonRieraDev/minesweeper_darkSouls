@@ -1,3 +1,4 @@
+// game.js
 // Variables globales
 let board = [];
 let gameConfig = {
@@ -234,7 +235,7 @@ function handleLeftClick(event) {
     checkWin();
 }
 
-// Animación de muerte al perder (YOU DIED)
+// Animación de muerte al perder (YOU DIED)
 function showDeathAnimation() {
     const youDied = document.getElementById('you-died');
     youDied.classList.add('active');
@@ -314,63 +315,9 @@ function checkWin() {
 
     if ((unrevealedSafeCells === 0) || (correctFlags === gameConfig.mines && flagsPlaced === gameConfig.mines)) {
         gameOver = true;
-        clearInterval(timerInterval);
-        startDiagonalFadeAnimation().then(() => {
-            showBonfireLit();
-        });
+        revealAll();
+        showModal('¡Ganaste!', `¡Felicitaciones! Completaste el juego en ${timer} segundos y ${clickCount} clicks.`);
     }
-}
-
-// Función para la animación diagonal
-async function startDiagonalFadeAnimation() {
-    const cells = document.querySelectorAll('.cell');
-    const rows = gameConfig.rows;
-    const cols = gameConfig.cols;
-    
-    // Convertir NodeList a array y añadir índices
-    const cellsArray = Array.from(cells).map((cell, index) => ({
-        element: cell,
-        row: Math.floor(index / cols),
-        col: index % cols
-    }));
-
-    // Calcular la suma máxima de índices para determinar las diagonales
-    const maxSum = (rows - 1) + (cols - 1);
-    
-    // Animar cada diagonal
-    for (let sum = 0; sum <= maxSum; sum++) {
-        const cellsInDiagonal = cellsArray.filter(cell => cell.row + cell.col === sum);
-        
-        // Animar todas las celdas en la diagonal actual
-        await Promise.all(cellsInDiagonal.map(cell => {
-            return new Promise(resolve => {
-                cell.element.style.transition = 'all 0.3s ease-out';
-                cell.element.style.transform = 'scale(0)';
-                cell.element.style.opacity = '0';
-                setTimeout(resolve, 100);
-            });
-        }));
-    }
-
-    // Esperar un momento antes de continuar
-    return new Promise(resolve => setTimeout(resolve, 200));
-}
-
-// Función para mostrar la animación de BONFIRE LIT
-function showBonfireLit() {
-    const bonfireLit = document.createElement('div');
-    bonfireLit.className = 'bonfire-lit';
-    bonfireLit.innerHTML = `
-        <div class="bonfire-lit-text">BONFIRE LIT</div>
-        <div class="bonfire-flames"></div>
-    `;
-    document.body.appendChild(bonfireLit);
-
-    // Mostrar el modal después de la animación
-    setTimeout(() => {
-        bonfireLit.remove();
-        showModal('¡Victoria!', `¡BONFIRE LIT! Has completado el juego en ${timer} segundos y ${clickCount} clicks.`);
-    }, 5000);
 }
 
 // Iniciar el temporizador
