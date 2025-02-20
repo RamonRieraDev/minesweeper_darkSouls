@@ -35,7 +35,6 @@ body {
     max-width: 100%;
 }
 
-
 header {
     text-align: center;
     margin-bottom: 15px;
@@ -63,12 +62,35 @@ h1 {
 .difficulty {
     margin-bottom: 15px;
     display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.mode-group {
+    display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 5px;
+    margin: 10px 0;
 }
 
-.difficulty button {
+.mode-group h3 {
+    width: 100%;
+    text-align: center;
+    color: #c7b377;
+    margin-bottom: 8px;
+    font-size: 1.1em;
+    letter-spacing: 1px;
+}
+
+.utility-buttons {
+    display: flex;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+button {
     padding: 6px 12px;
     border: 1px solid #c7b377;
     border-radius: 0;
@@ -80,32 +102,68 @@ h1 {
     letter-spacing: 1px;
     transition: all 0.3s;
     font-size: 0.9em;
+    position: relative;
 }
 
-.difficulty button:hover {
+button:hover {
     background-color: #3d3d3d;
     box-shadow: 0 0 10px rgba(199, 179, 119, 0.3);
 }
 
+button.active {
+    background-color: #3d3d3d;
+    box-shadow: inset 0 0 10px rgba(199, 179, 119, 0.3);
+}
+
 .hint-button {
-    background-color: #3d3d3d !important;
+    background-color: #3d3d3d;
 }
 
 .hint-button:hover {
-    background-color: #4a4a4a !important;
+    background-color: #4a4a4a;
 }
 
 .test-button {
-    background-color: #3d3d3d !important;
+    background-color: #3d3d3d;
 }
 
 .test-button:hover {
-    background-color: #4a4a4a !important;
+    background-color: #4a4a4a;
 }
 
 .test-button.active {
-    background-color: #4a4a4a !important;
+    background-color: #4a4a4a;
     box-shadow: inset 0 0 5px rgba(199, 179, 119, 0.3);
+}
+
+.timed-mode {
+    background-color: #2d4a4a !important;
+    border-color: #4a7a7a !important;
+}
+
+.timed-mode:hover {
+    background-color: #3d5a5a !important;
+    box-shadow: 0 0 10px rgba(74, 122, 122, 0.3) !important;
+}
+
+.cry-mode {
+    background-color: #4a2d2d !important;
+    border-color: #7a4a4a !important;
+}
+
+.cry-mode:hover {
+    background-color: #5a3d3d !important;
+    box-shadow: 0 0 10px rgba(122, 74, 74, 0.3) !important;
+}
+
+.die-mode {
+    background-color: #4a0f0f !important;
+    border-color: #7a1f1f !important;
+}
+
+.die-mode:hover {
+    background-color: #5a1f1f !important;
+    box-shadow: 0 0 10px rgba(122, 31, 31, 0.3) !important;
 }
 
 .board {
@@ -189,7 +247,7 @@ h1 {
 }
 
 .you-died-text {
-    font-family: 'Times New Roman', serif;
+    font-family: 'OptimusPrinceps', 'Times New Roman', serif;
     color: #8b0000;
     font-size: 0;
     text-align: center;
@@ -202,24 +260,55 @@ h1 {
 }
 
 .flagged {
-    background-image: url('assets/dark-souls-bonfire.gif'); /* Cambia la ruta a tu imagen */
+    background-image: url('assets/dark-souls-bonfire.gif');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-    text-indent: -9999px; /* Oculta el texto */
+    text-indent: -9999px;
 }
 
-.mine{
-    background-image: url('assets/mimic-thumbs-up.gif'); /* Cambia la ruta a tu imagen */
+.mine {
+    background-image: url('assets/mimic-thumbs-up.gif');
     background-size: cover;
-    text-indent: -9999px; /* Oculta el texto */
+    text-indent: -9999px;
 }
 
+<<<<<<< Updated upstream
+=======
+.tooltip {
+    position: relative;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 200px;
+    background-color: #1a1a1a;
+    color: #c7b377;
+    text-align: center;
+    padding: 5px;
+    border-radius: 3px;
+    border: 1px solid #3d3d3d;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -100px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 0.8em;
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+>>>>>>> Stashed changes
 @keyframes fadeIn {
     0% {opacity: 0;}
-
     30% {opacity: 1;}
-
     100% {opacity: 1;}
 }
 

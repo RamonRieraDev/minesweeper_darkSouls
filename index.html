@@ -10,33 +10,82 @@
 <body>
     <div class="container">
         <header>
-            <!-- Title -->
             <h1>Buscamimics</h1>
-            <!-- Game info -->
+            <!-- Información del Juego -->
             <div class="game-info">
                 <div id="timer">Tiempo: 0s</div>
                 <div id="flags">Banderas: 0</div>
                 <div id="clicks">Clicks: 0</div>
                 <div id="hints">Comodines: 2</div>
             </div>
+<<<<<<< Updated upstream
             
+=======
+            <!-- Tamaño del Tablero -->
+            <div class="difficulty">
+                <div class="mode-group">
+                    <h3>Tamaño del Tablero</h3>
+                    <button onclick="setSize('small')" class="tooltip size-button">
+                        8x8
+                        <span class="tooltiptext">Tablero pequeño, perfecto para partidas rápidas.</span>
+                    </button>
+                    <button onclick="setSize('medium')" class="tooltip size-button">
+                        12x12
+                        <span class="tooltiptext">Tamaño medio, el clásico equilibrio.</span>
+                    </button>
+                    <button onclick="setSize('large')" class="tooltip size-button">
+                        16x16
+                        <span class="tooltiptext">Tablero grande para mayor desafío.</span>
+                    </button>
+                </div>
+                <!-- Modo de Juego -->
+                <div class="mode-group">
+                    <h3>Modo de Juego</h3>
+                    <button onclick="setMode('normal')" class="tooltip mode-button">
+                        Normal
+                        <span class="tooltiptext">Modo clásico del buscaminas.</span>
+                    </button>
+                    <button onclick="setMode('timed')" class="timed-mode tooltip mode-button">
+                        Contrarreloj
+                        <span class="tooltiptext">¡60 segundos para ganar! La presión del tiempo en tu contra.</span>
+                    </button>
+                    <button onclick="setMode('prepare-to-cry')" class="cry-mode tooltip mode-button">
+                        Prepare to Cry
+                        <span class="tooltiptext">50% del tablero son minas. Cada movimiento podría ser el último.</span>
+                    </button>
+                    <button onclick="setMode('prepare-to-die')" class="die-mode tooltip mode-button">
+                        Prepare to Die
+                        <span class="tooltiptext">Solo DOS casillas seguras. Encuentra la segunda para ganar.</span>
+                    </button>
+                </div>
+                <!-- Botones de hint y modo pruebas -->
+                <div class="utility-buttons">
+                    <button onclick="useHint()" class="hint-button tooltip">
+                        Usar Comodín
+                        <span class="tooltiptext">Revela automáticamente la ubicación de una mina. Tienes 2 por partida.</span>
+                    </button>
+                    <button onclick="toggleTestMode()" id="test-button" class="test-button tooltip">
+                        Modo Pruebas
+                        <span class="tooltiptext">Muestra todas las minas del tablero. ¡Úsalo solo para practicar!</span>
+                    </button>
+                </div>
+            </div>
+>>>>>>> Stashed changes
         </header>
-        <!-- Board -->
+        <!-- Tablero -->
         <div id="board" class="board"></div>
-
-        <!-- Modal -->
+        <!-- Modal y reiniciar -->
         <div id="modal" class="modal">
             <div class="modal-content">
                 <h2 id="modal-title"></h2>
                 <p id="modal-text"></p>
+                <button onclick="startNewGame()">Reiniciar</button>
             </div>
         </div>
-
-        <!-- Lose -->
+        <!-- You died -->
         <div id="you-died" class="you-died">
             <div class="you-died-text">YOU DIED</div>
         </div>
-        
     </div>
     <script src="game.js"></script>
 </body>
