@@ -1,3 +1,5 @@
+// game.js
+// Variables globales
 let board = [];
 let gameConfig = {
     rows: 8,
@@ -10,45 +12,95 @@ let timer = 0;
 let timerInterval;
 let clickCount = 0;
 let flagsPlaced = 0;
-let hintsRemaining = 2; // Número de comodines disponibles
-let testMode = false; // Variable para el modo de pruebas
+let hintsRemaining = 2;
+let testMode = false;
+let timeLimit = null;
+let currentSize = 'small';
+let currentMode = 'normal';
 
-// Establece la dificultad del juego
-function setDifficulty(level) {
-    switch(level) {
-        case 'easy':
-            gameConfig = { rows: 8, cols: 8, mines: 10 };
+// Crear el tablero
+function calculateMines(rows, cols, mode) {
+    const totalCells = rows * cols;
+    switch(mode) {
+        case 'normal':
+            return Math.floor(totalCells * 0.15);
+        case 'prepare-to-cry':
+            return Math.floor(totalCells * 0.5);
+        case 'prepare-to-die':
+            return totalCells - 2;
+        default:
+            return Math.floor(totalCells * 0.15);
+    }
+}
+
+// Seleccionar tamaño
+function setSize(size) {
+    document.querySelectorAll('.size-button').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.querySelector(`button[onclick*="setSize('${size}')"]`).classList.add('active');
+    currentSize = size;
+    updateGameConfig();
+}
+
+// Seleccionar modo
+function setMode(mode) {
+    document.querySelectorAll('.mode-button').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.querySelector(`button[onclick*="setMode('${mode}')"]`).classList.add('active');
+    currentMode = mode;
+    timeLimit = mode === 'timed' ? 60 : null;
+    updateGameConfig();
+}
+
+// Actualizar configuración del juego
+function updateGameConfig() {
+    let rows, cols;
+    switch(currentSize) {
+        case 'small':
+            rows = cols = 8;
             break;
         case 'medium':
-            gameConfig = { rows: 12, cols: 12, mines: 20 };
+            rows = cols = 12;
             break;
-        case 'hard':
-            gameConfig = { rows: 16, cols: 16, mines: 40 };
+        case 'large':
+            rows = cols = 16;
             break;
+        default:
+            rows = cols = 8;
     }
+    
+    gameConfig = {
+        rows: rows,
+        cols: cols,
+        mines: calculateMines(rows, cols, currentMode)
+    };
+    
     startNewGame();
 }
 
-// Inicia una nueva partida, reiniciando todas las variables
+// Reiniciar el juego
 function startNewGame() {
     board = [];
     firstClick = true;
     gameOver = false;
     flagsPlaced = 0;
     clickCount = 0;
-    hintsRemaining = 2; // Reinicia los comodines
+    hintsRemaining = 2;
     clearInterval(timerInterval);
-    timer = 0;
-    document.getElementById('timer').textContent = 'Tiempo: 0s';
+    timer = timeLimit || 0;
+    document.getElementById('timer').textContent = timeLimit ? `Tiempo: ${timer}s` : 'Tiempo: 0s';
     document.getElementById('clicks').textContent = 'Clicks: 0';
     document.getElementById('flags').textContent = `Banderas: ${flagsPlaced}/${gameConfig.mines}`;
     document.getElementById('hints').textContent = `Comodines: ${hintsRemaining}`;
     document.getElementById('modal').style.display = 'none';
+    document.getElementById('you-died').classList.remove('active');
     createBoard();
     renderBoard();
 }
 
-// Crea el tablero inicial vacío
+// Crear el tablero
 function createBoard() {
     for (let i = 0; i < gameConfig.rows; i++) {
         board[i] = [];
@@ -63,23 +115,45 @@ function createBoard() {
     }
 }
 
-// Coloca las minas aleatoriamente, evitando el primer click
+// Colocar minas (después del primer clic)
 function placeMines(firstRow, firstCol) {
-    let minesPlaced = 0;
-    while (minesPlaced < gameConfig.mines) {
-        const row = Math.floor(Math.random() * gameConfig.rows);
-        const col = Math.floor(Math.random() * gameConfig.cols);
-        
-        if (!board[row][col].isMine && 
-            (Math.abs(row - firstRow) > 1 || Math.abs(col - firstCol) > 1)) {
-            board[row][col].isMine = true;
-            minesPlaced++;
+    if (currentMode === 'prepare-to-die') {
+        let secondSafeCell;
+        do {
+            secondSafeCell = {
+                row: Math.floor(Math.random() * gameConfig.rows),
+                col: Math.floor(Math.random() * gameConfig.cols)
+            };
+        } while (
+            (secondSafeCell.row === firstRow && secondSafeCell.col === firstCol) ||
+            (Math.abs(secondSafeCell.row - firstRow) <= 1 && Math.abs(secondSafeCell.col - firstCol) <= 1)
+        );
+
+        for (let row = 0; row < gameConfig.rows; row++) {
+            for (let col = 0; col < gameConfig.cols; col++) {
+                if ((row !== firstRow || col !== firstCol) && 
+                    (row !== secondSafeCell.row || col !== secondSafeCell.col)) {
+                    board[row][col].isMine = true;
+                }
+            }
+        }
+    } else {
+        let minesPlaced = 0;
+        while (minesPlaced < gameConfig.mines) {
+            const row = Math.floor(Math.random() * gameConfig.rows);
+            const col = Math.floor(Math.random() * gameConfig.cols);
+            
+            if (!board[row][col].isMine && 
+                (Math.abs(row - firstRow) > 1 || Math.abs(col - firstCol) > 1)) {
+                board[row][col].isMine = true;
+                minesPlaced++;
+            }
         }
     }
     calculateNeighborMines();
 }
 
-// Calcula el número de minas adyacentes para cada celda
+// Calcular las minas vecinas
 function calculateNeighborMines() {
     for (let row = 0; row < gameConfig.rows; row++) {
         for (let col = 0; col < gameConfig.cols; col++) {
@@ -99,7 +173,7 @@ function calculateNeighborMines() {
     }
 }
 
-// Renderiza el tablero en el DOM
+// Renderizar el tablero
 function renderBoard() {
     const boardElement = document.getElementById('board');
     boardElement.style.gridTemplateColumns = `repeat(${gameConfig.cols}, 40px)`;
@@ -132,7 +206,7 @@ function renderBoard() {
     }
 }
 
-// Maneja el click izquierdo (revelar celda)
+// Manejar el clic izquierdo (revelar celda)
 function handleLeftClick(event) {
     if (gameOver) return;
     
@@ -161,20 +235,18 @@ function handleLeftClick(event) {
     checkWin();
 }
 
-// Función para mostrar la animación de muerte
+// Animación de muerte al perder (YOU DIED)
 function showDeathAnimation() {
     const youDied = document.getElementById('you-died');
     youDied.classList.add('active');
     
-    // Mostrar el modal después de la animación
     setTimeout(() => {
         showModal('¡Perdiste!', `Duraste ${timer} segundos y usaste ${clickCount} clicks.`);
         youDied.classList.remove('active');
     }, 4000);
 }
 
-
-// Maneja el click derecho (colocar/quitar bandera)
+// Manejar el clic derecho (colocar banderas)
 function handleRightClick(event) {
     event.preventDefault();
     if (gameOver || firstClick) return;
@@ -196,7 +268,7 @@ function handleRightClick(event) {
     }
 }
 
-// Revela una celda y sus vecinas si es necesario
+// Revelar una celda
 function revealCell(row, col) {
     if (row < 0 || row >= gameConfig.rows || col < 0 || col >= gameConfig.cols ||
         board[row][col].isRevealed || board[row][col].isFlagged) {
@@ -215,7 +287,7 @@ function revealCell(row, col) {
     renderBoard();
 }
 
-// Revela todo el tablero (al ganar o perder)
+// Revelar todas las celdas 
 function revealAll() {
     for (let row = 0; row < gameConfig.rows; row++) {
         for (let col = 0; col < gameConfig.cols; col++) {
@@ -225,7 +297,7 @@ function revealAll() {
     renderBoard();
 }
 
-// Verifica si el jugador ha ganado
+// Comprobar si se ha ganado
 function checkWin() {
     let unrevealedSafeCells = 0;
     let correctFlags = 0;
@@ -248,15 +320,25 @@ function checkWin() {
     }
 }
 
-// Inicia el cronómetro
+// Iniciar el temporizador
 function startTimer() {
     timerInterval = setInterval(() => {
-        timer++;
+        if (timeLimit) {
+            timer--;
+            if (timer <= 0) {
+                gameOver = true;
+                revealAll();
+                showDeathAnimation();
+                return;
+            }
+        } else {
+            timer++;
+        }
         document.getElementById('timer').textContent = `Tiempo: ${timer}s`;
     }, 1000);
 }
 
-// Muestra el modal de victoria/derrota
+// Mostrar el modal 
 function showModal(title, text) {
     clearInterval(timerInterval);
     const modal = document.getElementById('modal');
@@ -265,11 +347,10 @@ function showModal(title, text) {
     modal.style.display = 'flex';
 }
 
-// Usa un comodín para revelar una mina
+// Usar un comodín
 function useHint() {
     if (gameOver || firstClick || hintsRemaining <= 0) return;
 
-    // Busca una mina no revelada y no marcada con bandera
     let mineFound = false;
     for (let row = 0; row < gameConfig.rows && !mineFound; row++) {
         for (let col = 0; col < gameConfig.cols && !mineFound; col++) {
@@ -287,12 +368,15 @@ function useHint() {
     }
 }
 
-// Activa/desactiva el modo de pruebas
+// Alternar el modo pruebas (mostrar todas las minas)
 function toggleTestMode() {
     testMode = !testMode;
     document.getElementById('test-button').classList.toggle('active');
     renderBoard();
 }
 
-// Iniciar el juego cuando carga la página
-window.onload = startNewGame;
+// Inicializar el juego después del reinicio
+window.onload = () => {
+    setSize('small');
+    setMode('normal');
+};
