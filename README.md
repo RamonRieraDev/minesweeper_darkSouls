@@ -8,6 +8,10 @@ Buscamimics es nuestra versión del clásico Buscaminas, pero con una dosis extr
 
 Hecho por un grupo de estudiantes con ganas de poner a prueba nuestras habilidades y, de paso, tu paciencia. 😈
 
+## 🚦 Cómo ejecutar el proyecto
+1. Clona el repositorio con `git clone https://github.com/RamonRieraDev/minesweeper_darkSouls
+2. Inicia index.html en tu navegador.
+
 ## 🎯 Características Principales
 
 ### 🎲 Modos de Juego
