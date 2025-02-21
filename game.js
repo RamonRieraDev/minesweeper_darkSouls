@@ -94,10 +94,15 @@ function startNewGame() {
     document.getElementById('flags').textContent = `Banderas: ${flagsPlaced}/${gameConfig.mines}`;
     document.getElementById('hints').textContent = `Comodines: ${hintsRemaining}`;
     document.getElementById('modal').style.display = 'none';
-    document.getElementById('you-died').classList.remove('active');
+    // Ya no es necesario: document.getElementById('you-died').classList.remove('active');
+    document.getElementById('board').classList.remove('fade-out');
+    // Reiniciar la opacidad del video
+    document.getElementById('background-video').style.opacity = "0.4";
     createBoard();
     renderBoard();
 }
+
+
 
 // Crear el tablero
 function createBoard() {
@@ -234,38 +239,7 @@ function handleLeftClick(event) {
     checkWin();
 }
 
-// Animación de muerte al perder (YOU DIED)
-function showDeathAnimation() {
-    const youDied = document.getElementById('you-died');
-    youDied.classList.add('active');
-    
-    setTimeout(() => {
-        showModal('¡Perdiste!', `Duraste ${timer} segundos y usaste ${clickCount} clicks.`);
-        youDied.classList.remove('active');
-    }, 4000);
-}
 
-// Manejar el clic derecho (colocar banderas)
-function handleRightClick(event) {
-    event.preventDefault();
-    if (gameOver || firstClick) return;
-
-    const row = parseInt(event.target.dataset.row);
-    const col = parseInt(event.target.dataset.col);
-
-    if (!board[row][col].isRevealed) {
-        if (!board[row][col].isFlagged && flagsPlaced < gameConfig.mines) {
-            board[row][col].isFlagged = true;
-            flagsPlaced++;
-        } else if (board[row][col].isFlagged) {
-            board[row][col].isFlagged = false;
-            flagsPlaced--;
-        }
-        document.getElementById('flags').textContent = `Banderas: ${flagsPlaced}/${gameConfig.mines}`;
-        renderBoard();
-        checkWin();
-    }
-}
 
 // Revelar una celda
 function revealCell(row, col) {
@@ -315,33 +289,33 @@ function checkWin() {
     if ((unrevealedSafeCells === 0) || (correctFlags === gameConfig.mines && flagsPlaced === gameConfig.mines)) {
         gameOver = true;
         clearInterval(timerInterval);
+        // Desvanecer el fondo del tablero
+        document.getElementById('board').classList.add('fade-out');
+        // Hacer que el video pase a opacidad 1
+        document.getElementById('background-video').style.opacity = "1";
         startDiagonalFadeAnimation().then(() => {
             showBonfireLit();
         });
     }
 }
 
-// Función para la animación diagonal
+// Animación de desvanecimiento diagonal de las celdas
 async function startDiagonalFadeAnimation() {
     const cells = document.querySelectorAll('.cell');
     const rows = gameConfig.rows;
     const cols = gameConfig.cols;
     
-    // Convertir NodeList a array y añadir índices
     const cellsArray = Array.from(cells).map((cell, index) => ({
         element: cell,
         row: Math.floor(index / cols),
         col: index % cols
     }));
 
-    // Calcular la suma máxima de índices para determinar las diagonales
     const maxSum = (rows - 1) + (cols - 1);
     
-    // Animar cada diagonal
     for (let sum = 0; sum <= maxSum; sum++) {
         const cellsInDiagonal = cellsArray.filter(cell => cell.row + cell.col === sum);
         
-        // Animar todas las celdas en la diagonal actual
         await Promise.all(cellsInDiagonal.map(cell => {
             return new Promise(resolve => {
                 cell.element.style.transition = 'all 0.3s ease-out';
@@ -352,8 +326,29 @@ async function startDiagonalFadeAnimation() {
         }));
     }
 
-    // Esperar un momento antes de continuar
     return new Promise(resolve => setTimeout(resolve, 200));
+}
+
+// Animación de muerte al perder (YOU DIED)
+function showDeathAnimation() {
+    // Crear el elemento "you died" dinámicamente
+    const youDied = document.createElement('div');
+    youDied.className = 'you-died active'; // 'active' activa la animación
+    const youDiedText = document.createElement('div');
+    youDiedText.className = 'you-died-text';
+    youDiedText.textContent = 'YOU DIED';
+    youDied.appendChild(youDiedText);
+    document.body.appendChild(youDied);
+    
+    setTimeout(() => {
+        showModal('¡Perdiste!', `Te ha comido un mimic. Duraste ${timer} segundos y usaste ${clickCount} clicks.`);
+        // Remover la clase 'active' para iniciar la transición de salida
+        youDied.classList.remove('active');
+        // Después de un tiempo, eliminar el elemento del DOM
+        setTimeout(() => {
+            youDied.remove();
+        }, 1000); // Ajusta este tiempo según la duración de tu animación en CSS
+    }, 4000);
 }
 
 // Función para mostrar la animación de BONFIRE LIT
@@ -366,12 +361,34 @@ function showBonfireLit() {
     `;
     document.body.appendChild(bonfireLit);
 
-    // Mostrar el modal después de la animación
     setTimeout(() => {
         bonfireLit.remove();
-        showModal('¡Victoria!', `¡BONFIRE LIT! Has completado el juego en ${timer} segundos y ${clickCount} clicks.`);
+        showModal('¡Victoria!', `Enhorabuena, has avivado la primera llama en ${timer} segundos y ${clickCount} clicks.`);
     }, 5000);
 }
+
+// Manejar el clic derecho (colocar banderas)
+function handleRightClick(event) {
+    event.preventDefault();
+    if (gameOver || firstClick) return;
+
+    const row = parseInt(event.target.dataset.row);
+    const col = parseInt(event.target.dataset.col);
+
+    if (!board[row][col].isRevealed) {
+        if (!board[row][col].isFlagged && flagsPlaced < gameConfig.mines) {
+            board[row][col].isFlagged = true;
+            flagsPlaced++;
+        } else if (board[row][col].isFlagged) {
+            board[row][col].isFlagged = false;
+            flagsPlaced--;
+        }
+        document.getElementById('flags').textContent = `Banderas: ${flagsPlaced}/${gameConfig.mines}`;
+        renderBoard();
+        checkWin();
+    }
+}
+
 
 // Iniciar el temporizador
 function startTimer() {

@@ -16,9 +16,6 @@ body {
     font-family: 'Cinzel', serif;
     background-color: #1a1a1a;
     min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     color: #c7b377;
     overflow: hidden;
 }
@@ -33,6 +30,8 @@ body {
     flex-direction: column;
     align-items: center;
     max-width: 100%;
+    position: relative;
+    z-index: 2; 
 }
 
 header {
@@ -179,6 +178,13 @@ button.active {
         0 20px 50px rgba(0, 0, 0, 0.5),
         0 0 20px rgba(199, 179, 119, 0.1);
     margin: 0 auto;
+    position: relative;
+    z-index: 1;
+    transition: background-color 1s ease;
+}
+
+.board.fade-out {
+    background-color: transparent;
 }
 
 .cell {
@@ -263,7 +269,6 @@ button.active {
 }
 
 .you-died {
-    display: none;
     position: fixed;
     top: 0;
     left: 0;
@@ -273,6 +278,11 @@ button.active {
     z-index: 1000;
     opacity: 0;
     transition: opacity 3s;
+}
+
+/* Ocultamos el elemento cuando no tenga la clase active */
+.you-died:not(.active) {
+    display: none;
 }
 
 .you-died.active {
@@ -294,6 +304,7 @@ button.active {
 .you-died.active .you-died-text {
     animation: textGrow 5s forwards;
 }
+
 
 .flagged {
     background-image: url('assets/dark-souls-bonfire.gif');
@@ -422,4 +433,17 @@ button.active {
     0% { opacity: 0; }
     30% { opacity: 0; }
     100% { opacity: 1; }
+}
+
+/* Estilos para el video de fondo */
+#background-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+    opacity: 0.4; /* Valor inicial */
+    transition: opacity 1s ease;
 }

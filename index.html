@@ -10,6 +10,11 @@
 <body>
     <div class="container">
         <header>
+            <!-- Video de fondo -->
+            <video id="background-video" autoplay muted loop>
+                <source src="assets/ds.mp4" type="video/mp4">               
+            </video>
+            <!-- Titulo -->
             <h1>Buscamimics</h1>
             <!-- Información del Juego -->
             <div class="game-info">
@@ -77,10 +82,6 @@
                 <p id="modal-text"></p>
                 <button onclick="startNewGame()">Reiniciar</button>
             </div>
-        </div>
-        <!-- You died -->
-        <div id="you-died" class="you-died">
-            <div class="you-died-text">YOU DIED</div>
         </div>
     </div>
     <script src="game.js"></script>
